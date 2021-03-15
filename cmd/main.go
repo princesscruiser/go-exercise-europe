@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"go-exercise-europe/server"
+	"go-exercise-europe/server/router"
 	"net/http"
 	"os"
 	"os/signal"
@@ -27,9 +27,12 @@ func main() {
 		log.Fatal().Msg("Could not unmarshall config file")
 	}
 
-	router := mux.NewRouter()
+	rt := mux.NewRouter()
+	if err := router.SetHandlers(rt); err != nil {
+		log.Fatal().Msg("Fatal error during router configuration")
+	}
 	srv := server.New()
-	if err := server.Configure(srv, &conf.ServConfig, router); err != nil {
+	if err := server.Configure(srv, &conf.ServConfig, rt); err != nil {
 		log.Fatal().Msg("Fatal error during server configuration")
 	}
 	ctx := context.Background()
@@ -59,7 +62,6 @@ func setupConfigurator() {
 
 	err := viper.ReadInConfig()
 	if err != nil {
-		fmt.Println("fatal error config file: default \n", err)
-		os.Exit(1)
+		log.Fatal().Msg(err.Error())
 	}
 }
