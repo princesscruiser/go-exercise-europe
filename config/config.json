@@ -1,6 +1,6 @@
 {
-  "ServConfig": {
-    "Port": 8089,
-    "Host": "localhost"
+  "servConfig": {
+    "port": 8089,
+    "host": "localhost"
   }
 }

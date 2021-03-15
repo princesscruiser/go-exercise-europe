@@ -12,8 +12,12 @@ import (
 )
 
 type ServConfig struct {
-	Port int
-	Host string
+	Port int    `mapstructure:"port"`
+	Host string `mapstructure:"host"`
+}
+
+type Config struct {
+	ServConfig ServConfig `mapstructure:"servConfig"`
 }
 
 func New() *http.Server {
@@ -21,7 +25,7 @@ func New() *http.Server {
 }
 
 func Configure(srv *http.Server, cnf *ServConfig, router *mux.Router) error {
-	srv.Addr = cnf.Host + strconv.Itoa(cnf.Port)
+	srv.Addr = cnf.Host + ":" + strconv.Itoa(cnf.Port)
 	srv.Handler = router
 	return nil
 }

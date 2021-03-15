@@ -22,14 +22,14 @@ func main() {
 	log.Info().Msg("Starting Server")
 
 	setupConfigurator()
-	conf := &server.ServConfig{}
+	conf := &server.Config{}
 	if err := viper.Unmarshal(conf); err != nil {
 		log.Fatal().Msg("Could not unmarshall config file")
 	}
 
 	router := mux.NewRouter()
 	srv := server.New()
-	if err := server.Configure(srv, conf, router); err != nil {
+	if err := server.Configure(srv, &conf.ServConfig, router); err != nil {
 		log.Fatal().Msg("Fatal error during server configuration")
 	}
 	ctx := context.Background()
@@ -38,6 +38,7 @@ func main() {
 
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	log.Info().Str("Host", conf.ServConfig.Host).Int("Port", conf.ServConfig.Port).Msg("Successfully started")
 	reason := <-done
 	log.Warn().Str("Closing due", reason.String()).Msg("Server is about to be stopped")
 }
@@ -53,7 +54,6 @@ func setupConfigurator() {
 	// Config
 	viper.SetConfigName("config") // config file name without extension
 	viper.SetConfigType("json")
-	viper.AddConfigPath(".")
 	viper.AddConfigPath("../config/") // config file path
 	viper.AutomaticEnv()              // read value ENV variable
 
