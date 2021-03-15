@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+
+	"github.com/rs/zerolog/log"
 )
 
 type QRepository interface {
@@ -20,14 +22,11 @@ func (jw *JsonRepo) Write() error {
 }
 
 func (jw *JsonRepo) Read() ([]byte, error) {
-	// Open our jsonFile
-	jsonFile, err := os.Open("../../resources/questions.json")
-	// if we os.Open returns an error then handle it
+	jsonFile, err := os.Open("../resources/questions.json")
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println("Successfully Opened users.json")
-	// defer the closing of our jsonFile so that we can parse it later on
+	log.Info().Msg("Successfully Opened questions.json")
 	defer jsonFile.Close()
 
 	byteValue, _ := ioutil.ReadAll(jsonFile)
