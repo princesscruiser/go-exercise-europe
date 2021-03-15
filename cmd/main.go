@@ -9,7 +9,6 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/gorilla/mux"
 	"github.com/rs/zerolog"
 	log "github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
@@ -19,6 +18,7 @@ func main() {
 
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+
 	log.Info().Msg("Starting Server")
 
 	setupConfigurator()
@@ -27,7 +27,12 @@ func main() {
 		log.Fatal().Msg("Could not unmarshall config file")
 	}
 
-	rt := mux.NewRouter()
+	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	if conf.DebugLevel == "debug" {
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	}
+
+	rt := router.New()
 	if err := router.SetHandlers(rt); err != nil {
 		log.Fatal().Msg("Fatal error during router configuration")
 	}
@@ -36,7 +41,7 @@ func main() {
 		log.Fatal().Msg("Fatal error during server configuration")
 	}
 	ctx := context.Background()
-	server.Start(ctx, srv)
+	server.Start(srv)
 	defer gracefullTerminate(ctx, srv)
 
 	done := make(chan os.Signal, 1)

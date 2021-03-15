@@ -2,5 +2,6 @@
   "servConfig": {
     "port": 8089,
     "host": "localhost"
-  }
+  },
+  "debugLevel":"info"
 }

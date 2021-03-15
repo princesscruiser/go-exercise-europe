@@ -1,13 +1,10 @@
 package server
 
 import (
-	"context"
 	"net/http"
-	"os"
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"github.com/rs/zerolog"
 	log "github.com/rs/zerolog/log"
 )
 
@@ -18,6 +15,7 @@ type ServConfig struct {
 
 type Config struct {
 	ServConfig ServConfig `mapstructure:"servConfig"`
+	DebugLevel string     `mapstructure:"debugLevel"`
 }
 
 func New() *http.Server {
@@ -30,15 +28,10 @@ func Configure(srv *http.Server, cnf *ServConfig, router *mux.Router) error {
 	return nil
 }
 
-func Start(ctx context.Context, srv *http.Server) {
+func Start(srv *http.Server) {
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatal().Msg(err.Error())
 		}
 	}()
-}
-
-func init() {
-	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 }
